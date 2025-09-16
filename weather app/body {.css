@@ -1,0 +1,138 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    transform-style: preserve-3d;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+}
+
+.dashboard {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 20px;
+    /* Removed 3D transform for better input and map usability */
+    /* transform-style: preserve-3d;
+    transform: rotateX(5deg) rotateY(-5deg); */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.search-section {
+    flex: 1 1 300px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#city-input {
+    padding: 10px;
+    flex-grow: 1;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    transition: background 0.3s ease;
+}
+
+#city-input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 1);
+}
+
+#search-btn, #clear-btn {
+    padding: 10px 15px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.7);
+    transition: background 0.3s ease;
+    /* Added subtle scale transform on hover */
+    transform-origin: center;
+}
+
+#search-btn:hover {
+    background: #45a049;
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(69, 160, 73, 0.9);
+}
+
+#clear-btn {
+    background: #ff6b6b;
+    box-shadow: 0 0 15px rgba(255, 107, 107, 0.7);
+    /* Added subtle scale transform on hover */
+    transform-origin: center;
+}
+
+#clear-btn:hover {
+    background: #ff4c4c;
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(255, 76, 76, 0.9);
+}
+
+.weather-info {
+    flex: 1 1 300px;
+    text-align: center;
+    text-shadow: 0 0 5px rgba(0,0,0,0.7);
+}
+
+.map-container {
+    flex: 1 1 300px;
+    height: 300px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    /* Removed 3D transform for better map usability */
+    /* transform-style: preserve-3d;
+    transform: translateZ(10px); */
+}
+
+#map {
+    height: 100%;
+    border-radius: 15px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard {
+        flex-direction: column;
+        transform: none;
+        box-shadow: none;
+        background: none;
+        padding: 0;
+    }
+    .search-section, .weather-info, .map-container {
+        text-align: center;
+        flex: 1 1 100%;
+    }
+    #city-input {
+        width: 80%;
+    }
+}

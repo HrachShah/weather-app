@@ -1,0 +1,9 @@
+{
+  "name": "weather-app",
+  "version": "1.0.0",
+  "description": "A weather app",
+  "scripts": {
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "license": "MIT"
+}

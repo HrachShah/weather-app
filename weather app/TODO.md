@@ -1,4 +1,6 @@
-# TODO: Fix Search Bar, Map, and Improve UI/UX
+# Weather App
+
+## TODO: Fix Search Bar, Map, and Improve UI/UX
 
 ## Steps to Complete
 

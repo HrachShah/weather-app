@@ -11,7 +11,15 @@ A modern weather application built with HTML, CSS, and JavaScript.
 
 ## Usage
 
-Simply open `weather app/Untitled-1.html` in a browser, or serve the `weather app` directory with any web server.
+Simply open `weather app/Untitled-1.html` in a browser, or serve the `weather app` directory with any static file server.
+
+```bash
+# Example with Python's http.server
+cd "weather app"
+python3 -m http.server 8000
+```
+
+Then open http://localhost:8000 in your browser.
 
 ## Development
 

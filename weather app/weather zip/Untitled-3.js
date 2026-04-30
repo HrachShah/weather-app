@@ -25,8 +25,6 @@ function initThreeJS() {
     // Create glass sphere
     const geometry = new THREE.SphereGeometry(1, 64, 64);
     const material = new THREE.MeshPhysicalMaterial({
-        transmission: 1,
-        opacity: 0.5,
         metalness: 0,
         roughness: 0,
         ior: 1.45,

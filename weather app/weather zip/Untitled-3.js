@@ -34,7 +34,6 @@ function initThreeJS() {
         envMapIntensity: 1,
         clearcoat: 1,
         clearcoatRoughness: 0,
-        transmission: 1,
         side: THREE.DoubleSide
     });
     sphere = new THREE.Mesh(geometry, material);

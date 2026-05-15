@@ -80,7 +80,8 @@ async function fetchWeather(city) {
         }
     } catch (error) {
         console.error('Error fetching weather:', error);
-        showError('Error fetching weather data');
+        const message = error instanceof Error ? error.message : 'Error fetching weather data';
+        showError(message);
     }
 }
 

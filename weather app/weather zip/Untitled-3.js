@@ -77,8 +77,8 @@ async function fetchWeather(city) {
         } else {
             showError('City not found');
         }
-    } catch (error) {
-        console.error('Error fetching weather:', error);
+    } catch (err) {
+        console.error('Error fetching weather:', err);
         showError('Error fetching weather data');
     }
 }

@@ -1,11 +1,12 @@
-// API Key
-const API_KEY = '9fe1ff896625297f6e506793620d3378';
+// API Key — replace with your own key from https://openweathermap.org/api
+const API_KEY = 'YOUR_API_KEY_HERE';
 
 // Three.js variables
 let scene, camera, renderer, sphere;
 
 // Leaflet map
 let map;
+let currentMarker = null;
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
@@ -96,7 +97,10 @@ function updateUI(data) {
 // Update map
 function updateMap(lat, lon) {
     map.setView([lat, lon], 13);
-    L.marker([lat, lon]).addTo(map);
+    if (currentMarker) {
+        map.removeLayer(currentMarker);
+    }
+    currentMarker = L.marker([lat, lon]).addTo(map);
 }
 
 // Update sphere based on temperature
@@ -140,6 +144,7 @@ function clearUI() {
             map.removeLayer(layer);
         }
     });
+    currentMarker = null;
     updateSphere(0);
 }
 

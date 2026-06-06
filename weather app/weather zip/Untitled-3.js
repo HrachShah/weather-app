@@ -86,15 +86,32 @@ async function fetchWeather(city) {
 
 // Update UI
 function updateUI(data) {
-    document.getElementById('city-name').textContent = data.name;
-    document.getElementById('temperature').textContent = `${Math.round(data.main.temp)}°C`;
-    document.getElementById('description').textContent = data.weather[0].description;
-    document.getElementById('humidity').textContent = `Humidity: ${data.main.humidity}%`;
-    document.getElementById('wind').textContent = `Wind: ${data.wind.speed} m/s`;
+    // OpenWeatherMap occasionally returns responses with partial fields
+    // (rate limit, network timeout, the deprecated /data/2.5 endpoint with
+    // a custom city, etc.). Guard every access with optional chaining and a
+    // sensible fallback so the UI degrades to '--' instead of throwing a
+    // TypeError mid-update.
+    const main = data.main ?? {};
+    const wind = data.wind ?? {};
+    const weather0 = Array.isArray(data.weather) ? data.weather[0] : undefined;
+    const fmtNum = (n, suffix = '') => (typeof n === 'number' && Number.isFinite(n) ? `${Math.round(n)}${suffix}` : '--');
+    const fmtStr = (s, fallback = '--') => (typeof s === 'string' && s.length > 0 ? s : fallback);
+
+    document.getElementById('city-name').textContent = fmtStr(data.name, 'Unknown city');
+    document.getElementById('temperature').textContent = `${fmtNum(main.temp)}°C`;
+    document.getElementById('description').textContent = fmtStr(weather0 && weather0.description, '--');
+    document.getElementById('humidity').textContent = `Humidity: ${fmtNum(main.humidity, '%')}`;
+    document.getElementById('wind').textContent = `Wind: ${fmtNum(wind.speed, ' m/s')}`;
 }
 
 // Update map
 function updateMap(lat, lon) {
+    // OpenWeatherMap's `coord` block is missing from some weather codes (e.g.
+    // 401 when the API key is wrong, or older /data/2.5 responses). Skip the
+    // map update in that case instead of crashing the whole updateUI call.
+    if (typeof lat !== 'number' || typeof lon !== 'number' || !Number.isFinite(lat) || !Number.isFinite(lon)) {
+        return;
+    }
     map.setView([lat, lon], 13);
     L.marker([lat, lon]).addTo(map);
 }

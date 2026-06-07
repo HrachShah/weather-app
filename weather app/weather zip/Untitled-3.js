@@ -69,14 +69,24 @@ function initMap() {
 async function fetchWeather(city) {
     try {
         const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=metric`);
-        const data = await response.json();
-        if (data.cod === 200 || data.cod === "200") {
-            updateUI(data);
-            updateMap(data.coord.lat, data.coord.lon);
-            updateSphere(data.main.temp);
-        } else {
-            showError('City not found');
+        if (!response.ok) {
+            // OpenWeatherMap returns 401 for invalid API key, 404 for unknown city,
+            // 429 for rate limit. Surface the status so the user can tell them apart.
+            if (response.status === 404) {
+                showError(`City "${city}" not found`);
+            } else if (response.status === 401) {
+                showError('Invalid API key — check your OpenWeatherMap configuration');
+            } else if (response.status === 429) {
+                showError('Rate limit reached, please try again in a moment');
+            } else {
+                showError(`Weather service returned status ${response.status}`);
+            }
+            return;
         }
+        const data = await response.json();
+        updateUI(data);
+        updateMap(data.coord.lat, data.coord.lon);
+        updateSphere(data.main.temp);
     } catch (error) {
         console.error('Error fetching weather:', error);
         showError('Error fetching weather data');

@@ -76,7 +76,16 @@ async function fetchWeather(city) {
             updateMap(data.coord.lat, data.coord.lon);
             updateSphere(data.main.temp);
         } else {
-            showError('City not found');
+            // data.message is provided by OpenWeatherMap for non-200 codes
+            // (e.g. "city not found", "Invalid API key"). The hard-coded
+            // "City not found" was wrong for the API-key case and unhelpful
+            // for any rate-limit / internal-error response. Fall back to
+            // the API message when present, otherwise to a generic line
+            // that still names the queried city.
+            const apiMessage = (typeof data.message === 'string' && data.message.length > 0)
+                ? data.message
+                : null;
+            showError(apiMessage ?? `Could not get weather for "${city}"`);
         }
     } catch (error) {
         console.error('Error fetching weather:', error);

@@ -17,11 +17,23 @@ let map;
 // and left the user staring at a frozen page.
 let errorMessage;
 
+// Bind input + button references after the DOM is ready. The previous
+// top-level lookups ran before the DOM was parsed, so the variables
+// held null and the click / keypress listeners below crashed the moment
+// a user clicked Search or Clear.
+let searchBtn;
+let clearBtn;
+let cityInput;
+
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
     errorMessage = document.getElementById('error-message');
+    searchBtn = document.getElementById('search-btn');
+    clearBtn = document.getElementById('clear-btn');
+    cityInput = document.getElementById('city-input');
     initThreeJS();
     initMap();
+    wireControls();
     // Default city
     fetchWeather('London');
 });
@@ -171,28 +183,15 @@ function clearUI() {
     updateSphere(0);
 }
 
-let searchBtn = document.getElementById('search-btn');
-let clearBtn = document.getElementById('clear-btn');
-let cityInput = document.getElementById('city-input');
+// Wire up the search / clear / enter-key handlers from inside the
+// DOMContentLoaded callback above so the input and button references
+// are guaranteed to point at real DOM nodes. The earlier top-level
+// lookups evaluated before the parser reached the <body>, so clicking
+// Search or hitting Enter crashed the whole page on first interaction.
+function wireControls() {
+    if (!searchBtn || !clearBtn || !cityInput) return;
 
-searchBtn.addEventListener('click', () => {
-    clearError();
-    const city = cityInput.value.trim();
-    if (city) {
-        fetchWeather(city);
-    } else {
-        showError('Please enter a city name');
-    }
-});
-
-clearBtn.addEventListener('click', () => {
-    cityInput.value = '';
-    clearError();
-    clearUI();
-});
-
-cityInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
+    searchBtn.addEventListener('click', () => {
         clearError();
         const city = cityInput.value.trim();
         if (city) {
@@ -200,8 +199,26 @@ cityInput.addEventListener('keypress', (e) => {
         } else {
             showError('Please enter a city name');
         }
-    }
-});
+    });
+
+    clearBtn.addEventListener('click', () => {
+        cityInput.value = '';
+        clearError();
+        clearUI();
+    });
+
+    cityInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            clearError();
+            const city = cityInput.value.trim();
+            if (city) {
+                fetchWeather(city);
+            } else {
+                showError('Please enter a city name');
+            }
+        }
+    });
+}
 
 // Resize
 window.addEventListener('resize', () => {

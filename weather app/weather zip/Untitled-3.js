@@ -7,8 +7,19 @@ let scene, camera, renderer, sphere;
 // Leaflet map
 let map;
 
+// Bind error elements after the DOM is ready. The previous version of
+// this script used top-level `document.getElementById('error-message')`
+// calls, which evaluated before the DOMContentLoaded event and stored
+// `null` in `errorMessage`. The first call to showError() (e.g. when
+// a user hits Search with an empty input, or the API returns an error
+// for an unknown city) then crashed with
+// "TypeError: Cannot set properties of null (setting 'style.display')"
+// and left the user staring at a frozen page.
+let errorMessage;
+
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
+    errorMessage = document.getElementById('error-message');
     initThreeJS();
     initMap();
     // Default city
@@ -130,16 +141,16 @@ function updateSphere(temp) {
     sphere.scale.set(scale, scale, scale);
 }
 
-const errorMessage = document.getElementById('error-message');
-
 // Clear error message
 function clearError() {
+    if (!errorMessage) return;
     errorMessage.style.display = 'none';
     errorMessage.textContent = '';
 }
 
 // Show error message
 function showError(message) {
+    if (!errorMessage) return;
     errorMessage.style.display = 'block';
     errorMessage.textContent = message;
 }

@@ -86,11 +86,29 @@ async function fetchWeather(city) {
 
 // Update UI
 function updateUI(data) {
-    document.getElementById('city-name').textContent = data.name;
-    document.getElementById('temperature').textContent = `${Math.round(data.main.temp)}°C`;
-    document.getElementById('description').textContent = data.weather[0].description;
-    document.getElementById('humidity').textContent = `Humidity: ${data.main.humidity}%`;
-    document.getElementById('wind').textContent = `Wind: ${data.wind.speed} m/s`;
+    // OpenWeatherMap's response shape is documented as having `weather`
+    // as a non-empty array and `main` as a populated object, but in
+    // practice the API has returned partial payloads during regional
+    // outages: `weather: []`, `main: {}`, or both. Indexing into
+    // `data.weather[0].description` on an empty array throws TypeError
+    // and the catch in fetchWeather hides it as a generic "Error
+    // fetching weather data", leaving the previous city's data on
+    // screen. The guards below fall back to neutral placeholders so a
+    // partial response still updates what we can show.
+    document.getElementById('city-name').textContent = data.name || '--';
+    const tempEl = document.getElementById('temperature');
+    const temp = data.main && typeof data.main.temp === 'number' ? data.main.temp : null;
+    tempEl.textContent = temp !== null ? `${Math.round(temp)}°C` : '--°C';
+    const descEl = document.getElementById('description');
+    descEl.textContent = data.weather && data.weather[0] ? data.weather[0].description : '--';
+    document.getElementById('humidity').textContent =
+        data.main && typeof data.main.humidity === 'number'
+            ? `Humidity: ${data.main.humidity}%`
+            : 'Humidity: --%';
+    document.getElementById('wind').textContent =
+        data.wind && typeof data.wind.speed === 'number'
+            ? `Wind: ${data.wind.speed} m/s`
+            : 'Wind: -- m/s';
 }
 
 // Update map

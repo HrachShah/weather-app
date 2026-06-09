@@ -67,18 +67,30 @@ function initMap() {
 }
 
 // Fetch weather data
+// Monotonically increasing request id. fetchWeather bumps this on every call
+// and the await chain checks it after the response lands; if a newer request
+// has started in the meantime, the older response is discarded so the user
+// doesn't see the old city's data flash on screen before the new one lands.
+let _fetchSeq = 0;
+
 async function fetchWeather(city) {
+    const seq = ++_fetchSeq;
     try {
         const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=metric`);
         const data = await response.json();
+        if (seq !== _fetchSeq) return; // stale, a newer request is in flight
         if (data.cod === 200 || data.cod === "200") {
             updateUI(data);
-            updateMap(data.coord.lat, data.coord.lon);
-            updateSphere(data.main.temp);
+            if (data.coord && typeof data.coord.lat === 'number' && typeof data.coord.lon === 'number') {
+                updateMap(data.coord.lat, data.coord.lon);
+            }
+            const temp = data.main && typeof data.main.temp === 'number' ? data.main.temp : 0;
+            updateSphere(temp);
         } else {
             showError('City not found');
         }
     } catch (error) {
+        if (seq !== _fetchSeq) return; // stale
         console.error('Error fetching weather:', error);
         showError('Error fetching weather data');
     }

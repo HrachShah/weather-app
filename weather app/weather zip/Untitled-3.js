@@ -70,15 +70,23 @@ function initMap() {
 async function fetchWeather(city) {
     try {
         const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=metric`);
+        if (!response.ok) {
+            // 401 invalid key, 404 city not found, 429 rate limit, 5xx server
+            showError(`Weather service returned ${response.status} ${response.statusText || ''}`.trim());
+            return;
+        }
         const data = await response.json();
         if (data.cod === 200 || data.cod === "200") {
             updateUI(data);
             updateMap(data.coord.lat, data.coord.lon);
             updateSphere(data.main.temp);
         } else {
-            showError('City not found');
+            showError(`City not found (${data.message || 'unknown location'})`);
         }
     } catch (error) {
+        // fetch only rejects on network failures / AbortError; response.json()
+        // throws SyntaxError if the body is not valid JSON. Both are real I/O
+        // problems, not application bugs, so a generic message is appropriate.
         console.error('Error fetching weather:', error);
         showError('Error fetching weather data');
     }

@@ -67,18 +67,22 @@ function initMap() {
 }
 
 // Fetch weather data
+let _fetchSeq = 0;
 async function fetchWeather(city) {
+    const mySeq = ++_fetchSeq;
     try {
         const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=metric`);
         const data = await response.json();
+        if (mySeq !== _fetchSeq) return; // a newer request has started
         if (data.cod === 200 || data.cod === "200") {
             updateUI(data);
             updateMap(data.coord.lat, data.coord.lon);
             updateSphere(data.main.temp);
         } else {
-            showError('City not found');
+            showError(data.message || 'City not found');
         }
     } catch (error) {
+        if (mySeq !== _fetchSeq) return;
         console.error('Error fetching weather:', error);
         showError('Error fetching weather data');
     }

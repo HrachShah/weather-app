@@ -155,15 +155,27 @@ let searchBtn = document.getElementById('search-btn');
 let clearBtn = document.getElementById('clear-btn');
 let cityInput = document.getElementById('city-input');
 
-searchBtn.addEventListener('click', () => {
+function getCity() {
+    return cityInput.value.trim();
+}
+
+function runSearch() {
     clearError();
-    const city = cityInput.value.trim();
+    if (searchBtn.disabled) {
+        // A fetch is already in flight; ignore re-entry from keypress
+        // or rapid clicks. The disabled flag is cleared in fetchWeather's
+        // finally block when the in-flight request settles.
+        return;
+    }
+    const city = getCity();
     if (city) {
         fetchWeather(city);
     } else {
         showError('Please enter a city name');
     }
-});
+}
+
+searchBtn.addEventListener('click', runSearch);
 
 clearBtn.addEventListener('click', () => {
     cityInput.value = '';
@@ -173,13 +185,7 @@ clearBtn.addEventListener('click', () => {
 
 cityInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
-        clearError();
-        const city = cityInput.value.trim();
-        if (city) {
-            fetchWeather(city);
-        } else {
-            showError('Please enter a city name');
-        }
+        runSearch();
     }
 });
 

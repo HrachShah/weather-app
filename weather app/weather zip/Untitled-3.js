@@ -7,12 +7,54 @@ let scene, camera, renderer, sphere;
 // Leaflet map
 let map;
 
+// DOM references (populated on DOMContentLoaded)
+let errorMessage, searchBtn, clearBtn, cityInput;
+
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
+    // The element lookups used to live at the top of the file, which made
+    // them run before the DOM was ready; on a slow-loading page the script
+    // would see null for every element and the first showError() / clearUI()
+    // would crash with 'Cannot set properties of null (setting ...)' instead
+    // of displaying the inline error. Bind them inside the same handler that
+    // already initializes the rest of the UI.
+    errorMessage = document.getElementById('error-message');
+    searchBtn = document.getElementById('search-btn');
+    clearBtn = document.getElementById('clear-btn');
+    cityInput = document.getElementById('city-input');
+
     initThreeJS();
     initMap();
     // Default city
     fetchWeather('London');
+
+    searchBtn.addEventListener('click', () => {
+        clearError();
+        const city = cityInput.value.trim();
+        if (city) {
+            fetchWeather(city);
+        } else {
+            showError('Please enter a city name');
+        }
+    });
+
+    clearBtn.addEventListener('click', () => {
+        cityInput.value = '';
+        clearError();
+        clearUI();
+    });
+
+    cityInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            clearError();
+            const city = cityInput.value.trim();
+            if (city) {
+                fetchWeather(city);
+            } else {
+                showError('Please enter a city name');
+            }
+        }
+    });
 });
 
 // Initialize Three.js
@@ -113,8 +155,6 @@ function updateSphere(temp) {
     sphere.scale.set(scale, scale, scale);
 }
 
-const errorMessage = document.getElementById('error-message');
-
 // Clear error message
 function clearError() {
     errorMessage.style.display = 'none';
@@ -142,38 +182,6 @@ function clearUI() {
     });
     updateSphere(0);
 }
-
-let searchBtn = document.getElementById('search-btn');
-let clearBtn = document.getElementById('clear-btn');
-let cityInput = document.getElementById('city-input');
-
-searchBtn.addEventListener('click', () => {
-    clearError();
-    const city = cityInput.value.trim();
-    if (city) {
-        fetchWeather(city);
-    } else {
-        showError('Please enter a city name');
-    }
-});
-
-clearBtn.addEventListener('click', () => {
-    cityInput.value = '';
-    clearError();
-    clearUI();
-});
-
-cityInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        clearError();
-        const city = cityInput.value.trim();
-        if (city) {
-            fetchWeather(city);
-        } else {
-            showError('Please enter a city name');
-        }
-    }
-});
 
 // Resize
 window.addEventListener('resize', () => {

@@ -104,6 +104,11 @@ function updateUI(data) {
 // Update map
 function updateMap(lat, lon) {
     map.setView([lat, lon], 13);
+    map.eachLayer((layer) => {
+        if (layer instanceof L.Marker) {
+            map.removeLayer(layer);
+        }
+    });
     L.marker([lat, lon]).addTo(map);
 }
 
